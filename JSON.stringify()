@@ -1,0 +1,62 @@
+// 1. SELECT ELEMENTS
+const taskInput = document.getElementById('taskInput');
+const addBtn = document.getElementById('add-btn');
+const taskList = document.getElementById('taskList');
+const clearBtn = document.getElementById('clear-btn');
+
+// 2. LOAD TASKS ON STARTUP
+document.addEventListener('DOMContentLoaded', () => {
+    console.log("App Started: Loading saved tasks...");
+    const savedTasks = JSON.parse(localStorage.getItem('myTasks')) || [];
+    savedTasks.forEach(taskText => {
+        createTaskElement(taskText);
+    });
+});
+
+// 3. ADD TASK LOGIC
+addBtn.addEventListener('click', () => {
+    const text = taskInput.value.trim();
+    if (text === "") return;
+
+    createTaskElement(text);   // Show on screen
+    saveToStorage(text);       // Save to local storage
+    taskInput.value = "";      // Clear the box
+});
+
+// 4. HELPER: CREATE HTML ROW
+function createTaskElement(text) {
+    const li = document.createElement('li');
+    li.innerHTML = `
+        <span>${text}</span> 
+        <button class="delete-btn" onclick="deleteTask(this)">X</button>
+    `;
+    taskList.appendChild(li);
+}
+
+// 5. HELPER: SAVE TO STORAGE
+function saveToStorage(newTask) {
+    const tasks = JSON.parse(localStorage.getItem('myTasks')) || [];
+    tasks.push(newTask);
+    localStorage.setItem('myTasks', JSON.stringify(tasks));
+    console.log("Saved to storage:", tasks);
+}
+
+// 6. DELETE SINGLE TASK
+function deleteTask(buttonElement) {
+    const li = buttonElement.parentElement;
+    const textToRemove = li.querySelector('span').innerText;
+
+    li.remove(); // Remove from UI
+
+    let tasks = JSON.parse(localStorage.getItem('myTasks')) || [];
+    tasks = tasks.filter(t => t !== textToRemove);
+    localStorage.setItem('myTasks', JSON.stringify(tasks));
+}
+
+// 7. CLEAR EVERYTHING
+clearBtn.addEventListener('click', () => {
+    if (confirm("Clear all tasks?")) {
+        taskList.innerHTML = "";
+        localStorage.removeItem('myTasks');
+    }
+});

@@ -1,0 +1,90 @@
+button:hover {
+    filter: brightness(90%);
+    transform: translateY(-1px);
+}
+li:hover {
+    background-color: #91d4ee;
+}
+#counter-container {
+    text-align: center;
+    margin: 15px 0; /* Adds space above and below */
+    padding-top: 10px;
+    border-top: 1px solid #000000; /* Adds a subtle line above it */
+    color: #000000;
+    font-size: 0.9rem;
+    font-weight: bold;
+}
+/* Center the counter and add a separation line */
+#counter-container {
+    text-align: center;
+    margin-top: 20px;
+    padding-top: 10px;
+    border-top: 1px solid #fa70b0; /* Light grey line */
+    color: #000000;
+    font-size: 0.9rem;
+}
+
+#taskCount {
+    font-weight: bold;
+    color: #28a745; /* Matches the green Add button */
+    font-size: 1rem;
+}
+
+/* Ensure the clear button stays below the counter */
+#clear-btn {
+    display: block;
+    margin: 15px auto 0;
+}
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    /* This creates a beautiful blue-to-purple gradient */
+    background: linear-gradient(135deg, #8e9bd6 0%, #6b77e2 100%); 
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0;
+}
+
+.container {
+    background: rgba(255, 255, 255, 0.95); /* Slightly see-through white */
+    padding: 2rem;
+    border-radius: 15px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+    width: 350px;
+    backdrop-filter: blur(5px); /* Blurs the background behind the card */
+}
+#counter-container {
+    text-align: center;
+    margin-top: 15px;
+    padding-top: 10px;
+    border-top: 2px solid #764ba2; /* Matches your purple theme */
+    color: #333;
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+#taskCount {
+    color: #28a745; /* Keeps the number green for success */
+    font-size: 1.2rem;
+}
+#add-btn:hover {
+    background-color: #218838;
+    transform: scale(1.05); /* Slightly grows the button */
+    transition: 0.2s;
+}
+
+#clear-btn:hover {
+    color: #dc3545;
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+li {
+    transition: all 0.3s ease;
+}
+
+li:hover {
+    background-color: #f8f9fa;
+    padding-left: 15px; /* Subtle slide effect */
+}
