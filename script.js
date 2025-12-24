@@ -1,129 +1,147 @@
+// 1. Elements-ah select pannuvom
 const taskInput = document.getElementById('taskInput');
-const prioritySelect = document.getElementById('prioritySelect');
+const taskDate = document.getElementById('taskDate'); // Pudhu Date Input
 const addBtn = document.getElementById('addBtn');
 const taskList = document.getElementById('taskList');
+const prioritySelect = document.getElementById('prioritySelect');
 const taskCount = document.getElementById('taskCount');
 const clearAllBtn = document.getElementById('clearAllBtn');
+const voiceBtn = document.getElementById('voiceBtn');
 const dateDisplay = document.getElementById('dateDisplay');
 
-// Show current date
-dateDisplay.innerText = new Date().toLocaleDateString('en-US', { 
-    weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' 
-});
+// 2. Browser-la notification permission kekka
+if (Notification.permission !== 'granted' && Notification.permission !== 'denied') {
+    Notification.requestPermission();
+}
 
-// Add Task Button Click
-addBtn.addEventListener('click', () => {
-    const text = taskInput.value.trim();
-    const priority = prioritySelect.value;
+// 3. Inraiya date-ah header-la kaatta
+const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+dateDisplay.innerText = new Date().toLocaleDateString(undefined, options);
 
-    // YOUR ALERT LOGIC
-    if (text === "") {
-        alert("Please enter the task! 😊");
-        return;
-    }
+// 4. LocalStorage-la irundhu tasks-ah edukka
+let tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+renderTasks();
 
-    createTask(text, priority);
-    taskInput.value = ""; // Clear input
-    updateCounter();
-});
+// 5. Task-ah Screen-la kaatta
+function renderTasks() {
+    taskList.innerHTML = '';
+    tasks.forEach((task, index) => {
+        const li = document.createElement('li');
+        li.className = `${task.priority} ${task.completed ? 'completed' : ''}`;
+        
+        li.innerHTML = `
+            <div class="task-info">
+                <span class="task-text">${task.text}</span>
+                <span class="priority-label">${task.priority} Priority ${task.date ? '| Due: ' + task.date : ''}</span>
+            </div>
+            <button class="delete-btn" onclick="deleteTask(${index})">✕</button>
+        `;
 
-// Create Task Element
-function createTask(text, priority) {
-    const li = document.createElement('li');
-    li.className = priority; // Add priority class for border color
+        li.addEventListener('click', (e) => {
+            if (e.target.classList.contains('delete-btn')) return;
+            toggleTask(index);
+        });
 
-    li.innerHTML = `
-        <div class="task-info">
-            <span class="task-text">${text}</span>
-            <span class="priority-label">${priority} Priority</span>
-        </div>
-        <button class="delete-btn">✕</button>
-    `;
-
-    // Delete Button (Right side)
-    li.querySelector('.delete-btn').addEventListener('click', () => {
-        li.remove();
-        updateCounter();
+        taskList.appendChild(li);
     });
-
-    taskList.appendChild(li);
+    updateStats();
 }
 
-// Update Counter
-function updateCounter() {
-    taskCount.innerText = taskList.children.length;
-}
-
-// Clear All Functionality
-clearAllBtn.addEventListener('click', () => {
-    if (taskList.children.length === 0) return;
+// 6. Pudhu Task add panna
+function addTask() {
+    const text = taskInput.value.trim();
+    const dateValue = taskDate.value;
     
-    if (confirm("Are you sure you want to clear all tasks?")) {
-        taskList.innerHTML = "";
-        updateCounter();
+    if (text === '') return;
+
+    const newTask = {
+        text: text,
+        priority: prioritySelect.value,
+        date: dateValue,
+        completed: false,
+        notified: false
+    };
+
+    tasks.push(newTask);
+    saveAndRender();
+    taskInput.value = '';
+    taskDate.value = '';
+}
+
+// 7. Remainder Notification Logic
+function checkReminders() {
+    const today = new Date().toISOString().split('T')[0];
+
+    tasks.forEach(task => {
+        // Inraiya date-um task date-um onna irundha notification anuppum
+        if (task.date === today && !task.completed && !task.notified) {
+            if (Notification.permission === 'granted') {
+                new Notification("Task Reminder! 📅", {
+                    body: `Don't forget: ${task.text}`,
+                    icon: 'icon.png'
+                });
+                task.notified = true;
+                saveAndRender();
+            }
+        }
+    });
+}
+
+// Ovvoru 1 minute-kum background-la check pannum
+setInterval(checkReminders, 60000);
+
+// 8. Helper Functions
+function deleteTask(index) {
+    tasks.splice(index, 1);
+    saveAndRender();
+}
+
+function toggleTask(index) {
+    tasks[index].completed = !tasks[index].completed;
+    saveAndRender();
+}
+
+function saveAndRender() {
+    localStorage.setItem('tasks', JSON.stringify(tasks));
+    renderTasks();
+}
+
+function updateStats() {
+    taskCount.innerText = tasks.length;
+}
+
+// 9. Event Listeners
+addBtn.addEventListener('click', addTask);
+taskInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') addTask(); });
+
+clearAllBtn.addEventListener('click', () => {
+    if(confirm("Ellathaiyum clear pannalaama?")) {
+        tasks = [];
+        saveAndRender();
     }
 });
-const voiceBtn = document.getElementById('voiceBtn');
 
-// Voice Recognition Setup
-const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-
+// 10. VOICE COMMAND (MIC)
+const SpeechRecognition = window.webkitSpeechRecognition || window.SpeechRecognition;
 if (SpeechRecognition) {
     const recognition = new SpeechRecognition();
-    recognition.lang = 'en-US'; // English-la pesuna record aagum
+    recognition.lang = 'en-US';
 
     voiceBtn.addEventListener('click', () => {
         recognition.start();
         voiceBtn.classList.add('recording');
+        voiceBtn.style.background = "#ff5e57";
     });
 
     recognition.onresult = (event) => {
-        const transcript = event.results[0][0].transcript;
-        taskInput.value = transcript; // Pesuna vaarthai input-la vizhum
+        taskInput.value = event.results[0][0].transcript;
         voiceBtn.classList.remove('recording');
-        
-        // Pesunathuku apram auto-va task add panna:
-        // addBtn.click(); 
+        voiceBtn.style.background = "#ffffff";
+        setTimeout(addTask, 500); 
     };
 
     recognition.onerror = () => {
         voiceBtn.classList.remove('recording');
-        alert("Voice recognition failed. Please try again.");
+        voiceBtn.style.background = "#ffffff";
     };
-} else {
-    voiceBtn.style.display = "none"; // Browser support pannala-na mic-ah maraichudum
 }
-function createTask(text, priority) {
-    const li = document.createElement('li');
-    li.className = priority;
-
-    li.innerHTML = `
-        <div class="task-info">
-            <span class="task-text">${text}</span>
-            <span class="priority-label">${priority} Priority</span>
-        </div>
-        <button class="delete-btn">✕</button>
-    `;
-
-    // ADD THIS: Task mela click panna Strike-through aagum
-    li.addEventListener('click', (e) => {
-        // Delete button click panna idhu work aaga koodathu
-        if (e.target.classList.contains('delete-btn')) return;
-        li.classList.toggle('completed');
-    });
-
-    li.querySelector('.delete-btn').addEventListener('click', () => {
-        li.remove();
-        updateCounter();
-    });
-
-    taskList.appendChild(li);
-}
-// Task mela click panna strike-through (vetti vidura) design apply aagum
-li.addEventListener('click', (e) => {
-    // Delete button-ah click panna idhu work aaga koodathu
-    if (e.target.classList.contains('delete-btn')) return;
-    
-    // Intha line thaan ".completed" class-ah add/remove pannum
-    li.classList.toggle('completed');
-});
