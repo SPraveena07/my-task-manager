@@ -83,3 +83,5 @@ function updateCounter() {
         taskCount.innerText = taskList.children.length;
     }
 }
+// Add task logic-ku keela idha podunga
+taskInput.value = "";
