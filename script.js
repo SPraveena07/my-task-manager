@@ -63,3 +63,33 @@ clearAllBtn.addEventListener('click', () => {
         updateCounter();
     }
 });
+const voiceBtn = document.getElementById('voiceBtn');
+
+// Voice Recognition Setup
+const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+if (SpeechRecognition) {
+    const recognition = new SpeechRecognition();
+    recognition.lang = 'en-US'; // English-la pesuna record aagum
+
+    voiceBtn.addEventListener('click', () => {
+        recognition.start();
+        voiceBtn.classList.add('recording');
+    });
+
+    recognition.onresult = (event) => {
+        const transcript = event.results[0][0].transcript;
+        taskInput.value = transcript; // Pesuna vaarthai input-la vizhum
+        voiceBtn.classList.remove('recording');
+        
+        // Pesunathuku apram auto-va task add panna:
+        // addBtn.click(); 
+    };
+
+    recognition.onerror = () => {
+        voiceBtn.classList.remove('recording');
+        alert("Voice recognition failed. Please try again.");
+    };
+} else {
+    voiceBtn.style.display = "none"; // Browser support pannala-na mic-ah maraichudum
+}
