@@ -93,3 +93,37 @@ if (SpeechRecognition) {
 } else {
     voiceBtn.style.display = "none"; // Browser support pannala-na mic-ah maraichudum
 }
+function createTask(text, priority) {
+    const li = document.createElement('li');
+    li.className = priority;
+
+    li.innerHTML = `
+        <div class="task-info">
+            <span class="task-text">${text}</span>
+            <span class="priority-label">${priority} Priority</span>
+        </div>
+        <button class="delete-btn">✕</button>
+    `;
+
+    // ADD THIS: Task mela click panna Strike-through aagum
+    li.addEventListener('click', (e) => {
+        // Delete button click panna idhu work aaga koodathu
+        if (e.target.classList.contains('delete-btn')) return;
+        li.classList.toggle('completed');
+    });
+
+    li.querySelector('.delete-btn').addEventListener('click', () => {
+        li.remove();
+        updateCounter();
+    });
+
+    taskList.appendChild(li);
+}
+// Task mela click panna strike-through (vetti vidura) design apply aagum
+li.addEventListener('click', (e) => {
+    // Delete button-ah click panna idhu work aaga koodathu
+    if (e.target.classList.contains('delete-btn')) return;
+    
+    // Intha line thaan ".completed" class-ah add/remove pannum
+    li.classList.toggle('completed');
+});
