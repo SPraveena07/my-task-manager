@@ -33,6 +33,20 @@ header img { width: 80px; display: block; margin: 0 auto 10px; }
     gap: 10px;
     align-items: center;
 }
+/* Text visibility fix for Mobile */
+input, select {
+    color: white !important; 
+    background-color: #333 !important;
+}
+
+input::placeholder {
+    color: #bbb !important; 
+}
+
+#taskInput, #taskDate, #prioritySelect {
+    border: 1px solid #555;
+    padding: 12px;
+}
 
 #taskInput {
     order: 1; flex: 2; min-width: 180px;
@@ -81,3 +95,11 @@ li {
 }
 
 .clear-btn { background: #ff5e57; color: white; border: none; padding: 8px 15px; border-radius: 8px; cursor: pointer; }
+/* Tamil suggestion box style */
+.goog-transliterate-indic-suggestion-menu {
+    z-index: 2000 !important;
+    background-color: white !important;
+    color: black !important;
+    border-radius: 5px;
+    font-family: 'Hind Madurai', sans-serif;
+}
