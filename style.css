@@ -1,8 +1,11 @@
+/* Google Font Import */
+@import url('https://fonts.googleapis.com/css2?family=Hind+Madurai:wght@400;700&display=swap');
+
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    font-family: 'Poppins', sans-serif;
+    font-family: 'Hind Madurai', sans-serif;
 }
 
 body {
@@ -11,95 +14,109 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    padding: 15px;
+    padding: 20px;
 }
 
 .container {
-    background: #eccdcd; /* Dark theme as per your screenshot */
+    background: #f3d5d5;
     width: 100%;
-    max-width: 500px;
+    max-width: 450px; /* Mobile-ku perfect alignment */
     padding: 25px;
-    border-radius: 20px;
-    box-shadow: 0 15px 35px rgba(0,0,0,0.3);
+    border-radius: 30px;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+    text-align: center;
 }
 
-header h1 { color: #bb86fc; text-align: center; margin-bottom: 5px; }
-header p { color: #be3a3a; text-align: center; font-size: 0.9rem; margin-bottom: 20px; }
-header img { width: 80px; display: block; margin: 0 auto 10px; }
+header {
+    margin-bottom: 20px;
+}
 
+.app-logo {
+    width: 90px;
+    height: 90px;
+    object-fit: contain;
+    margin-bottom: 10px;
+    border-radius: 15px;
+}
+
+h1 {
+    color: #9b6dff;
+    font-size: 2rem;
+    margin-bottom: 20px;
+}
+
+/* Input Section Alignment */
 .input-section {
     display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    align-items: center;
+    gap: 8px;
+    margin-bottom: 15px;
 }
-/* Text visibility fix for Mobile */
-input, select {
-    color: white !important; 
-    background-color: #333 !important;
+
+input[type="text"], select {
+    background: #333;
+    color: white !important;
+    border: none;
+    padding: 12px;
+    border-radius: 10px;
+    width: 100%;
 }
 
 input::placeholder {
-    color: #bbb !important; 
+    color: #bbb;
 }
 
-#taskInput, #taskDate, #prioritySelect {
-    border: 1px solid #555;
-    padding: 12px;
-}
-
-#taskInput {
-    order: 1; flex: 2; min-width: 180px;
-    padding: 12px; border-radius: 10px; border: 1px solid #000000;
-    background: #9c8c8c; color: rgb(0, 0, 0);
-}
-
-#voiceBtn {
-    order: 2; width: 45px; height: 45px;
-    background: #b3b0b0; border: 1px solid #444; border-radius: 10px;
-    cursor: pointer; font-size: 1.2rem;
+/* Buttons */
+button {
+    cursor: pointer;
+    transition: 0.3s;
+    border: none;
+    border-radius: 10px;
 }
 
 #addBtn {
-    order: 3; background: #3498db; color: white; border: none;
-    padding: 12px 20px; border-radius: 10px; font-weight: bold; cursor: pointer;
-}
-
-#taskDate, #prioritySelect {
-    order: 4; flex: 1; min-width: 130px;
-    padding: 12px; border-radius: 10px; border: 1px solid #444;
-    background: #333; color: rgb(245, 234, 234);
-}
-
-/* Delete Button Style (Red Circle) */
-.delete-btn {
-    background: #ff5e57 !important;
-    color: white !important;
-    border: none;
-    width: 30px; height: 30px;
-    border-radius: 50%;
-    cursor: pointer;
+    background: #3498db;
+    color: white;
+    padding: 10px 20px;
     font-weight: bold;
 }
 
-ul { list-style: none; margin-top: 20px; }
+.icon-btn {
+    background: #888;
+    padding: 10px;
+}
+
+/* Stats and Clear All Row */
+.stats {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 20px;
+    padding-top: 15px;
+    border-top: 1px solid #ccc;
+    color: #555;
+}
+
+.clear-btn {
+    background: #ff6b6b;
+    color: white;
+    padding: 8px 15px;
+    font-size: 0.9rem;
+}
+
+/* Task List */
+ul {
+    list-style: none;
+    margin-top: 20px;
+    text-align: left;
+}
+
 li {
-    background: #252525; margin-bottom: 10px; padding: 15px;
-    border-radius: 12px; display: flex; justify-content: space-between;
-    align-items: center; color: rgb(247, 242, 242);
-}
-
-.stats-bar {
-    display: flex; justify-content: space-between; align-items: center;
-    margin-top: 20px; color: #888; border-top: 1px solid #333; padding-top: 15px;
-}
-
-.clear-btn { background: #ff5e57; color: white; border: none; padding: 8px 15px; border-radius: 8px; cursor: pointer; }
-/* Tamil suggestion box style */
-.goog-transliterate-indic-suggestion-menu {
-    z-index: 2000 !important;
-    background-color: white !important;
-    color: black !important;
-    border-radius: 5px;
-    font-family: 'Hind Madurai', sans-serif;
+    background: white;
+    margin-bottom: 10px;
+    padding: 15px;
+    border-radius: 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
 }

@@ -3,12 +3,10 @@ const taskDate = document.getElementById('taskDate');
 const addBtn = document.getElementById('addBtn');
 const taskList = document.getElementById('taskList');
 const prioritySelect = document.getElementById('prioritySelect');
-const taskCount = document.getElementById('taskCount');
-const voiceBtn = document.getElementById('voiceBtn');
 const langToggle = document.getElementById('langToggle');
 
 let tasks = JSON.parse(localStorage.getItem('tasks')) || [];
-let currentLang = 'ta'; // Default Tamil-la vekkalaam appo dhaan unga akka-vukku easy-ah irukkum
+let currentLang = 'ta'; 
 
 const translations = {
     en: {
@@ -17,8 +15,10 @@ const translations = {
         datePlaceholder: "Date (DD-MM-YYYY)",
         addBtn: "Add",
         clearAll: "Clear All",
+        totalText: "Total Tasks: ",
         warningEmpty: "Please enter the task",
-        warningDate: "Warning: Previous date selected!"
+        warningDate: "Warning: Previous date selected!",
+        priorities: ["Low", "Medium", "High"]
     },
     ta: {
         title: "எனது நாள் திட்டம்",
@@ -26,29 +26,54 @@ const translations = {
         datePlaceholder: "தேதி (DD-MM-YYYY)",
         addBtn: "சேர்",
         clearAll: "அனைத்தையும் நீக்கு",
+        totalText: "மொத்த வேலைகள்: ",
         warningEmpty: "தயவுசெய்து ஒரு வேலையை உள்ளிடவும்",
-        warningDate: "எச்சரிக்கை: நீங்கள் பழைய தேதியைத் தேர்ந்தெடுத்துள்ளீர்கள்!"
+        warningDate: "எச்சரிக்கை: நீங்கள் பழைய தேதியைத் தேர்ந்தெடுத்துள்ளீர்கள்!",
+        priorities: ["குறைவு", "நடுத்தரம்", "அதிகம்"]
     }
 };
 
-// --- RENDER TASKS ---
+function updateLanguage() {
+    const t = translations[currentLang];
+    
+    // 1. Text content update
+    document.querySelector('h1').innerText = t.title;
+    taskInput.placeholder = t.inputPlaceholder;
+    taskDate.placeholder = t.datePlaceholder;
+    addBtn.innerText = t.addBtn;
+    document.getElementById('clearAllBtn').innerText = t.clearAll;
+
+    // 2. Stats Text Fix (Inga dhaan error irundhadhu)
+    const statsTextDiv = document.getElementById('statsText');
+    statsTextDiv.innerHTML = `<span>${t.totalText}</span> <span id="taskCount">${tasks.length}</span>`;
+
+    // 3. Dropdown Fix (Low/Medium/High language update)
+    for (let i = 0; i < prioritySelect.options.length; i++) {
+        prioritySelect.options[i].text = t.priorities[i];
+    }
+    
+    renderTasks();
+}
+
 function renderTasks() {
     taskList.innerHTML = '';
     tasks.forEach((task, index) => {
         const li = document.createElement('li');
+        // Task display-la priority-ah update panna
         li.innerHTML = `
             <div>
                 <div style="font-weight:bold">${task.text}</div>
                 <div style="font-size:0.8rem; color:#aaa">${task.priority} | Due: ${task.date || 'No Date'}</div>
             </div>
-            <button class="delete-btn" onclick="deleteTask(${index})">✕</button>
+            <button class="delete-btn" onclick="deleteTask(${index})" style="background:none; border:none; color:red; font-size:1.2rem; cursor:pointer;">✕</button>
         `;
         taskList.appendChild(li);
     });
-    taskCount.innerText = tasks.length;
+    
+    const countElement = document.getElementById('taskCount');
+    if(countElement) countElement.innerText = tasks.length;
 }
 
-// --- ADD TASK FUNCTION ---
 function addTask() {
     const t = translations[currentLang];
     const text = taskInput.value.trim();
@@ -59,32 +84,17 @@ function addTask() {
         return;
     }
 
-    if (dateInput !== "") {
-        const parts = dateInput.split('-');
-        const selectedDate = new Date(parts[2], parts[1] - 1, parts[0]);
-        const today = new Date();
-        today.setHours(0,0,0,0);
-        if (selectedDate < today) {
-            alert(t.warningDate);
-            return;
-        }
-    }
-
-    tasks.push({ text, date: dateInput, priority: prioritySelect.value });
+    // Save task with current priority text
+    tasks.push({ 
+        text, 
+        date: dateInput, 
+        priority: prioritySelect.options[prioritySelect.selectedIndex].text 
+    });
+    
     localStorage.setItem('tasks', JSON.stringify(tasks));
-    renderTasks();
     taskInput.value = '';
     taskDate.value = '';
-}
-
-// --- LANGUAGE UPDATE ---
-function updateLanguage() {
-    const t = translations[currentLang];
-    document.querySelector('h1').innerText = t.title;
-    taskInput.placeholder = t.inputPlaceholder;
-    taskDate.placeholder = t.datePlaceholder;
-    addBtn.innerText = t.addBtn;
-    document.getElementById('clearAllBtn').innerText = t.clearAll;
+    renderTasks();
 }
 
 langToggle.onclick = () => {
@@ -98,16 +108,16 @@ function deleteTask(index) {
     renderTasks();
 }
 
-// Clear All Logic
+// Clear All with language support
 document.getElementById('clearAllBtn').onclick = () => {
-    if (confirm("Are you sure?")) {
+    if (confirm(currentLang === 'ta' ? "நிச்சயமாக நீக்க வேண்டுமா?" : "Are you sure?")) {
         tasks = [];
         localStorage.setItem('tasks', JSON.stringify(tasks));
         renderTasks();
     }
 };
 
-// Button Events
-addBtn.addEventListener('click', addTask); // Click event direct-ah bind panrom
+addBtn.addEventListener('click', addTask);
+
+// Initial Load
 updateLanguage();
-renderTasks();
