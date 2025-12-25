@@ -121,3 +121,39 @@ addBtn.addEventListener('click', addTask);
 
 // Initial Load
 updateLanguage();
+// Mic (Speech Recognition) Setup
+const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+if (SpeechRecognition) {
+    const recognition = new SpeechRecognition();
+    
+    // Mic button click panna trigger aagum
+    const voiceBtn = document.getElementById('voiceBtn');
+    
+    voiceBtn.addEventListener('click', () => {
+        // Current language-ku thagunthapadi recognition language-ah mathuvom
+        recognition.lang = (currentLang === 'ta') ? 'ta-IN' : 'en-US';
+        
+        recognition.start();
+        voiceBtn.style.background = "#ff4b2b"; // Mic on-ah irukkum pothu red color
+    });
+
+    recognition.onresult = (event) => {
+        const transcript = event.results[0][0].transcript;
+        document.getElementById('taskInput').value = transcript;
+        voiceBtn.style.background = "#888"; // Normal color-ku mathiduvom
+    };
+
+    recognition.onerror = () => {
+        voiceBtn.style.background = "#888";
+        alert("Mic error! Please allow microphone permission in your browser.");
+    };
+
+    recognition.onend = () => {
+        voiceBtn.style.background = "#888";
+    };
+} else {
+    // Browser support illati mic button-ah hide panniduvom
+    document.getElementById('voiceBtn').style.display = 'none';
+    console.log("Speech Recognition not supported in this browser.");
+}
