@@ -3,50 +3,40 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Praveena's Task Manager</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <title>My Day Plan</title>
     <link rel="stylesheet" href="style.css">
-    <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/4697/4697260.png">
-    
-<link rel="apple-touch-icon" href="task management app.png">
-<link rel="manifest" href="manifest.json">
+    <link rel="manifest" href="manifest.json">
+<link rel="icon" type="image/png" href="logo.png">
+<link rel="apple-touch-icon" href="logo.png">
 
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black">
-<meta name="apple-mobile-web-app-title" content="My Day Plan">
 </head>
 <body>
-
     <div class="container">
-        <header style="text-align: center;">
-    <img src="task management.png" 
-         alt="My Day Plan Logo" 
-         style="width: 100px; border-radius: 20px; margin-bottom: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.2);">
-    <h1>My Day Plan</h1>
-    <p id="dateDisplay"></p>
-</header>
+        <header>
+            <img src="task management.png" alt="Logo">
+            <h1>My Day Plan</h1>
+            <p id="dateDisplay"></p>
+        </header>
 
         <div class="input-section">
-        <button id="addBtn">Add</button>
-        <button id="voiceBtn">🎤</button>
-        
-        <input type="text" id="taskInput" placeholder="Add a new task">
-        
-        <input type="text" id="taskDate" placeholder="Date (DD-MM-YYYY)">
-        <select id="prioritySelect">
-            <option value="low">Low</option>
-            <option value="medium">Medium</option>
-            <option value="high">High</option>
-        </select>
-    </div>
+            <input type="text" id="taskInput" placeholder="Add a new task">
+            <button id="voiceBtn">🎤</button>
+            <button id="addBtn">Add</button>
+            
+            <input type="text" id="taskDate" placeholder="Date (DD-MM-YYYY)">
+            <select id="prioritySelect">
+                <option value="low">Low</option>
+                <option value="medium">Medium</option>
+                <option value="high">High</option>
+            </select>
+        </div>
 
-    <div class="stats-bar">
-        <span>Total Tasks: <strong id="taskCount">0</strong></span>
-        <button id="clearAllBtn" class="clear-btn">Clear All</button>
+        <div class="stats-bar">
+            <span>Total Tasks: <strong id="taskCount">0</strong></span>
+            <button id="clearAllBtn" class="clear-btn">Clear All</button>
+        </div>
+        <ul id="taskList"></ul>
     </div>
-    <ul id="taskList"></ul>
-</div>
-
     <script src="script.js"></script>
 </body>
 </html>

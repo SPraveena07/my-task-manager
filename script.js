@@ -4,7 +4,6 @@ const addBtn = document.getElementById('addBtn');
 const taskList = document.getElementById('taskList');
 const prioritySelect = document.getElementById('prioritySelect');
 const taskCount = document.getElementById('taskCount');
-const clearAllBtn = document.getElementById('clearAllBtn');
 const voiceBtn = document.getElementById('voiceBtn');
 
 let tasks = JSON.parse(localStorage.getItem('tasks')) || [];
@@ -14,15 +13,13 @@ function renderTasks() {
     taskList.innerHTML = '';
     tasks.forEach((task, index) => {
         const li = document.createElement('li');
-        li.className = `${task.priority} ${task.completed ? 'completed' : ''}`;
         li.innerHTML = `
             <div class="task-info">
-                <span class="task-text">${task.text}</span>
-                <span class="priority-label">${task.priority} | Due: ${task.date || 'No Date'}</span>
+                <div style="font-weight:bold">${task.text}</div>
+                <div style="font-size:0.8rem; color:#aaa">${task.priority} | Due: ${task.date || 'No Date'}</div>
             </div>
-            <button onclick="deleteTask(${index})">✕</button>
+            <button class="delete-btn" onclick="deleteTask(${index})">✕</button>
         `;
-        li.onclick = (e) => { if(e.target.tagName !== 'BUTTON') toggleTask(index); };
         taskList.appendChild(li);
     });
     taskCount.innerText = tasks.length;
@@ -30,66 +27,96 @@ function renderTasks() {
 
 function addTask() {
     const text = taskInput.value.trim();
-    const date = taskDate.value.trim();
+    const dateInput = taskDate.value.trim();
 
-    // Box empty-ah irundha alert kaattum
     if (text === '') {
-        alert("Please enter the task"); 
+        alert("Please enter the task");
         return;
     }
 
-    tasks.push({ 
-        text, 
-        date, 
-        priority: prioritySelect.value, 
-        completed: false, 
-        notified: false 
-    });
-    
-    saveAndRender();
+    // --- PREVIOUS DATE WARNING LOGIC ---
+    if (dateInput !== "") {
+        const selectedDateParts = dateInput.split('-'); // Expected format DD-MM-YYYY
+        const selectedDate = new Date(selectedDateParts[2], selectedDateParts[1] - 1, selectedDateParts[0]);
+        
+        const today = new Date();
+        today.setHours(0, 0, 0, 0); // Today's time-ah reset panrom comparison-kaaga
+
+        if (selectedDate < today) {
+            alert("Warning: You have entered a previous date!");
+            return; // Task add aagatha maathiri block panrom
+        }
+    }
+
+    tasks.push({ text, date: dateInput, priority: prioritySelect.value, completed: false, notified: false });
+    saveAndPush();
     taskInput.value = '';
     taskDate.value = '';
 }
 
-function saveAndRender() {
+function saveAndPush() {
     localStorage.setItem('tasks', JSON.stringify(tasks));
     renderTasks();
 }
 
-function deleteTask(index) { tasks.splice(index, 1); saveAndRender(); }
-function toggleTask(index) { tasks[index].completed = !tasks[index].completed; saveAndRender(); }
-
-// NOTIFICATION LOGIC (Manual Date Format: DD-MM-YYYY)
-setInterval(() => {
-    const now = new Date();
-    const today = `${String(now.getDate()).padStart(2,'0')}-${String(now.getMonth()+1).padStart(2,'0')}-${now.getFullYear()}`;
-    
-    tasks.forEach(task => {
-        if (task.date === today && !task.completed && !task.notified) {
-            if (Notification.permission === 'granted') {
-                new Notification("Task Reminder! 📅", { body: `Don't forget: ${task.text}` });
-                task.notified = true;
-                saveAndRender();
-            }
-        }
-    });
-}, 10000);
-
-// VOICE RECOGNITION
-const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-if (SpeechRecognition) {
-    const recognition = new SpeechRecognition();
-    voiceBtn.onclick = () => {
-        recognition.start();
-        voiceBtn.classList.add('recording');
-    };
-    recognition.onresult = (e) => {
-        taskInput.value = e.results[0][0].transcript;
-        voiceBtn.classList.remove('recording');
-        setTimeout(addTask, 500);
-    };
-    recognition.onerror = () => voiceBtn.classList.remove('recording');
+function deleteTask(index) {
+    tasks.splice(index, 1);
+    saveAndPush();
 }
 
 addBtn.onclick = addTask;
-clearAllBtn.onclick = () => { if(confirm("Clear all?")) { tasks = []; saveAndRender(); } };
+
+// --- MIC (VOICE RECOGNITION) FIX ---
+const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+if (SpeechRecognition) {
+    const recognition = new SpeechRecognition();
+    recognition.lang = 'en-US'; // Language set panrom
+    recognition.interimResults = false;
+
+    voiceBtn.onclick = () => {
+        try {
+            recognition.start();
+            voiceBtn.style.backgroundColor = "#ff5e57"; // Recording start aana red color
+        } catch (err) {
+            console.error("Speech recognition already started", err);
+        }
+    };
+
+    recognition.onresult = (e) => {
+        const transcript = e.results[0][0].transcript;
+        taskInput.value = transcript;
+        voiceBtn.style.backgroundColor = "#333"; // Back to normal
+        setTimeout(addTask, 500);
+    };
+
+    recognition.onerror = (event) => {
+        voiceBtn.style.backgroundColor = "#333";
+        if(event.error === 'not-allowed') {
+            alert("Mic permission denied. Please allow mic in browser settings.");
+        } else {
+            alert("Mic error: " + event.error);
+        }
+    };
+
+    recognition.onend = () => {
+        voiceBtn.style.backgroundColor = "#333";
+    };
+} else {
+    voiceBtn.onclick = () => alert("Sorry, your browser does not support voice recognition.");
+}
+// Clear All Button Logic
+const clearAllBtn = document.getElementById('clearAllBtn');
+
+clearAllBtn.onclick = () => {
+    if (tasks.length === 0) {
+        alert("No tasks to clear!");
+        return;
+    }
+    
+    // Oru confirmation kettu apparam dhaan delete pannum
+    if (confirm("Are you sure you want to clear all tasks?")) {
+        tasks = []; // Ella task-ayum kaali pannidhum
+        saveAndPush(); // LocalStorage-la update panni screen-ah refresh pannum
+    }
+};
