@@ -73,18 +73,33 @@ function renderTasks() {
     const countElement = document.getElementById('taskCount');
     if(countElement) countElement.innerText = tasks.length;
 }
-
 function addTask() {
     const t = translations[currentLang];
     const text = taskInput.value.trim();
     const dateInput = taskDate.value.trim();
 
+    // 1. Task empty-ah irundha warning
     if (text === '') {
         alert(t.warningEmpty);
         return;
     }
 
-    // Save task with current priority text
+    // 2. Old date check (Indha logic dhaan ippo fix pannirukkom)
+    if (dateInput !== "") {
+        // Date format: DD-MM-YYYY (e.g., 25-12-2024)
+        const parts = dateInput.split('-');
+        const selectedDate = new Date(parts[2], parts[1] - 1, parts[0]);
+        
+        const today = new Date();
+        today.setHours(0, 0, 0, 0); // Time-ah zero panna dhaan date mattum compare aagum
+
+        if (selectedDate < today) {
+            alert(t.warningDate); // Old date-ah irundha alert varum
+            return; // Inga 'return' panradhaala task add aagaadhu
+        }
+    }
+
+    // 3. Task add panra logic
     tasks.push({ 
         text, 
         date: dateInput, 
