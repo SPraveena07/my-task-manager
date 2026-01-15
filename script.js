@@ -33,6 +33,69 @@ const translations = {
     }
 };
 
+function addItem() {
+    const taskValue = taskInput.value.trim();
+    const dateValue = dateInput.value.trim();
+
+    // 1. Basic Check: Empty fields
+    if (taskValue === "" || dateValue === "") {
+        alert("தயவுசெய்து வேலையையும் தேதியையும் உள்ளிடவும்!");
+        return;
+    }
+
+    // 2. Format Check: DD-MM-YYYY format-la irukkannu paarkurom
+    const dateRegex = /^(\d{2})-(\d{2})-(\d{4})$/;
+    const match = dateValue.match(dateRegex);
+
+    if (!match) {
+        alert("தேதி வடிவம் தவறு! DD-MM-YYYY என்று போடவும் (எ.கா: 15-01-2026)");
+        return;
+    }
+
+    const day = parseInt(match[1]);
+    const month = parseInt(match[2]);
+    const year = parseInt(match[3]);
+
+    // Current Year setup (2026)
+    const today = new Date();
+    const currentYear = today.getFullYear();
+
+    // --- STRICT RULES (Blocking 90-89-2027) ---
+
+    // Rule A: Day must be 1 to 31
+    if (day < 1 || day > 31) {
+        alert("தவறான தேதி! 1 முதல் 31 வரை மட்டுமே இருக்க வேண்டும்.");
+        return;
+    }
+
+    // Rule B: Month must be 1 to 12
+    if (month < 1 || month > 12) {
+        alert("தவறான மாதம்! 1 முதல் 12 வரை மட்டுமே இருக்க வேண்டும்.");
+        return;
+    }
+
+    // Rule C: Previous Year Check (Pazhaya varshatha thadukka)
+    if (year < currentYear) {
+        alert("கடந்த கால வருடங்களை (Previous Years) பயன்படுத்த முடியாது!");
+        return;
+    }
+
+    // Rule D: Calendar Consistency Check (Feb 30 or April 31 block panna)
+    const testDate = new Date(year, month - 1, day);
+    if (testDate.getDate() !== day || testDate.getMonth() + 1 !== month) {
+        alert("இந்த தேதி நாட்காட்டியில் இல்லை (Invalid Calendar Date)!");
+        return;
+    }
+
+    // --- ALL RULES PASSED ---
+    // Inga unga task add panra code-ah podunga
+    createTask(taskValue, dateValue); 
+    
+    // Clear inputs
+    taskInput.value = "";
+    dateInput.value = "";
+}
+
 function updateLanguage() {
     const t = translations[currentLang];
     
